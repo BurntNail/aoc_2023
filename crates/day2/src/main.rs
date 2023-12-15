@@ -52,30 +52,51 @@ impl Game {
     }
 }
 
-fn part1(input: &str) -> u32 {
+fn parse_games (input: &str) -> Vec<Game> {
+    input.lines().map(|l| Game::parse(l).unwrap().1).collect()
+}
+
+fn part2 (games: Vec<Game>) -> u32 {
+    let mut sum = 0;
+
+    for game in games {
+        let mut max_red = 0;
+        let mut max_green = 0;
+        let mut max_blue = 0;
+
+        for round in game.1.into_iter().map(|x| x.0) {
+            max_red = max_red.max(round.get(&Colour::Red).copied().unwrap_or_default());
+            max_green = max_green.max(round.get(&Colour::Green).copied().unwrap_or_default());
+            max_blue = max_blue.max(round.get(&Colour::Blue).copied().unwrap_or_default());
+        }
+
+        let power = max_red * max_green * max_blue;
+        if power == 0 {
+            panic!()
+        }
+
+        sum += power;
+    }
+
+    sum
+}
+
+fn part1(games: Vec<Game>) -> u32 {
     const MAX_RED: u32 = 12;
     const MAX_GREEN: u32 = 13;
     const MAX_BLUE: u32 = 14;
 
     let mut sum = 0;
-    for line in input.lines() {
-        let (_, game) = Game::parse(line).unwrap();
-
-        println!("Game {}", game.0);
-
+    for game in games {
         let mut failed = false;
         for round in game.1.into_iter().map(|x| x.0) {
-            println!("\t{round:?}");
             if round.get(&Colour::Red).copied().unwrap_or_default() > MAX_RED || round.get(&Colour::Green).copied().unwrap_or_default() > MAX_GREEN || round.get(&Colour::Blue).copied().unwrap_or_default() > MAX_BLUE {
-
-                println!("\t\tSTINKY");
-
                 failed = true;
                 break;
             }
         }
 
-        if failed {
+        if !failed {
             sum += game.0;
         }
     }
@@ -86,7 +107,9 @@ fn part1(input: &str) -> u32 {
 
 fn main () {
     let input = include_str!("input.txt");
+    let games = parse_games(input);
 
-    let sum = part1(input);
+    // let sum = part1(games);
+    let sum = part2(games);
     println!("{sum}");
 }
