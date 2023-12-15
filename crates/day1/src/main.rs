@@ -52,8 +52,9 @@ fn part2 (input: &str) -> u32{
             for (target, result) in search_targets {
 
                 let works = if target.len() > 1 {
+
                     let end = i+target.len();
-                    if end >= len {
+                    if end > len {
                         continue;
                     }
         
@@ -71,6 +72,8 @@ fn part2 (input: &str) -> u32{
                 }
             }
         }
+
+        // println!("{first:?} & {last:?}");
 
         let line_count = match (first, last) {
             (Some(a), Some(b)) => a * 10 + b,
