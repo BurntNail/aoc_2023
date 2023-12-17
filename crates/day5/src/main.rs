@@ -1,15 +1,20 @@
 fn main() {
     let input = include_str!("input.txt");
-    let almanac = Almanac::parse(input);
+    let mut lines = input.lines();
 
-    let n = part1(almanac);
+    let seeds = parse_one_list(&lines.next().unwrap()[7..]);
+    skip(&mut lines, 2);
+    let almanac = Almanac::parse(lines);
+
+    // let n = part1(almanac, seeds);
+    let n = part2(almanac, seeds);
     println!("{n}");
 }
 
-fn part1(a: Almanac) -> u64 {
+fn part1(a: Almanac, seeds: Vec<u64>) -> u64 {
     let mut smallest_location = u64::MAX;
 
-    for seed in a.seeds {
+    for seed in seeds {
         let soil = a.seeds_to_soil.map(seed);
         let fertiliser = a.soil_to_fertiliser.map(soil);
         let water = a.fertiliser_to_water.map(fertiliser);
@@ -19,6 +24,53 @@ fn part1(a: Almanac) -> u64 {
         let location = a.humidity_to_location.map(humidity);
 
         smallest_location = smallest_location.min(location);
+    }
+
+    smallest_location
+}
+
+fn part2(a: Almanac, seeds: Vec<u64>) -> u64 {
+    let mut smallest_location = u64::MAX;
+
+    let total_no = seeds.iter().enumerate().map(|(i, n)| {
+        if i % 2 == 1 {
+            *n
+        } else {
+            0
+        }
+    }).sum::<u64>();
+
+    println!("Creating seeds list of len {total_no}");
+
+    let seeds = seeds
+    .chunks(2)
+    .map(|window| {
+        let [a, b] = window else {
+            unreachable!()
+        };
+        (*a)..(*a + *b)
+    })
+    .flatten().collect::<Vec<_>>();
+
+    println!("About to go through seeds");
+
+    for seed in seeds
+    {
+        let soil = a.seeds_to_soil.map(seed);
+        let fertiliser = a.soil_to_fertiliser.map(soil);
+        let water = a.fertiliser_to_water.map(fertiliser);
+        let light = a.water_to_light.map(water);
+        let temperature = a.light_to_temperature.map(light);
+        let humidity = a.temperature_to_humidity.map(temperature);
+        let location = a.humidity_to_location.map(humidity);
+
+        smallest_location = smallest_location.min(location);
+
+        // if seed == 82 {
+        //     println!("{:?}", (seed, soil, fertiliser, water, light, temperature, humidity, location));
+        // }
+
+        // println!("@ {seed} got {location}");
     }
 
     smallest_location
@@ -34,7 +86,6 @@ pub struct Mapping {
 pub struct Mappings(Vec<Mapping>);
 
 pub struct Almanac {
-    pub seeds: Vec<u64>,
     pub seeds_to_soil: Mappings,
     pub soil_to_fertiliser: Mappings,
     pub fertiliser_to_water: Mappings,
@@ -119,11 +170,7 @@ impl Mappings {
 }
 
 impl Almanac {
-    pub fn parse(i: &str) -> Self {
-        let mut lines = i.lines();
-
-        let seeds = parse_one_list(&lines.next().unwrap()[7..]);
-        skip(&mut lines, 2);
+    pub fn parse<'a>(mut lines: impl Iterator<Item = &'a str>) -> Self {
         let seeds_to_soil = Mappings::parse(&mut lines);
         skip(&mut lines, 2);
         let soil_to_fertiliser = Mappings::parse(&mut lines);
@@ -139,7 +186,6 @@ impl Almanac {
         let humidity_to_location = Mappings::parse(&mut lines);
 
         Self {
-            seeds,
             seeds_to_soil,
             soil_to_fertiliser,
             fertiliser_to_water,
