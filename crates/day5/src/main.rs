@@ -1,3 +1,6 @@
+use rayon::prelude::*;
+use indicatif::ParallelProgressIterator;
+
 fn main() {
     let input = include_str!("input.txt");
     let mut lines = input.lines();
@@ -30,50 +33,39 @@ fn part1(a: Almanac, seeds: Vec<u64>) -> u64 {
 }
 
 fn part2(a: Almanac, seeds: Vec<u64>) -> u64 {
-    let mut smallest_location = u64::MAX;
+    // let total_no = seeds
+    //     .iter()
+    //     .enumerate()
+    //     .map(|(i, n)| if i % 2 == 1 { *n } else { 0 })
+    //     .sum::<u64>();
 
-    let total_no = seeds.iter().enumerate().map(|(i, n)| {
-        if i % 2 == 1 {
-            *n
-        } else {
-            0
-        }
-    }).sum::<u64>();
-
-    println!("Creating seeds list of len {total_no}");
-
-    let seeds = seeds
-    .chunks(2)
-    .map(|window| {
+    let seeds = seeds.chunks_exact(2).into_iter().map(|window| {
         let [a, b] = window else {
             unreachable!()
         };
-        (*a)..(*a + *b)
-    })
-    .flatten().collect::<Vec<_>>();
+        (*a, *a + *b)
+    }).collect::<Vec<_>>();
+    let seeds_len = seeds.len();
 
-    println!("About to go through seeds");
-
-    for seed in seeds
-    {
-        let soil = a.seeds_to_soil.map(seed);
-        let fertiliser = a.soil_to_fertiliser.map(soil);
-        let water = a.fertiliser_to_water.map(fertiliser);
-        let light = a.water_to_light.map(water);
-        let temperature = a.light_to_temperature.map(light);
-        let humidity = a.temperature_to_humidity.map(temperature);
-        let location = a.humidity_to_location.map(humidity);
-
-        smallest_location = smallest_location.min(location);
-
-        // if seed == 82 {
-        //     println!("{:?}", (seed, soil, fertiliser, water, light, temperature, humidity, location));
-        // }
-
-        // println!("@ {seed} got {location}");
-    }
-
-    smallest_location
+    seeds
+        .into_par_iter()
+        .progress_count(seeds_len as u64)
+        .map(|(start, end)| {
+            (start..end)
+                .into_iter()
+                .map(|seed| {
+                    let soil = a.seeds_to_soil.map(seed);
+                    let fertiliser = a.soil_to_fertiliser.map(soil);
+                    let water = a.fertiliser_to_water.map(fertiliser);
+                    let light = a.water_to_light.map(water);
+                    let temperature = a.light_to_temperature.map(light);
+                    let humidity = a.temperature_to_humidity.map(temperature);
+                    let location = a.humidity_to_location.map(humidity);
+                    location
+                })
+                .min().unwrap()
+        })
+        .min().unwrap()
 }
 
 #[derive(Copy, Clone, Debug)]
