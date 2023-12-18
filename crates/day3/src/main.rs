@@ -65,7 +65,7 @@ fn get_part_numbers(
 
     let lines = input.lines().collect::<Vec<_>>();
 
-    let width = lines.get(0).map(|x| x.len()).unwrap();
+    let width = lines.first().map(|x| x.len()).unwrap();
     let height = lines.len();
 
     let lines_as_char_arrays = lines
@@ -117,7 +117,7 @@ fn get_part_numbers(
                             }
 
                             let location = (left_most..=right_most, search_y);
-                            let number = (&lines_as_char_arrays[search_y][left_most..=right_most])
+                            let number = (lines_as_char_arrays[search_y][left_most..=right_most])
                                 .iter()
                                 .collect::<String>()
                                 .parse()

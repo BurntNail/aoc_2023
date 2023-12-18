@@ -1,4 +1,4 @@
-use std::{fmt::Debug, str::FromStr, time::Instant, collections::HashMap};
+use std::{fmt::Debug, str::FromStr, collections::HashMap};
 
 fn main() {
     let input = include_str!("input.txt");
@@ -12,7 +12,7 @@ fn main() {
 }
 
 fn get_scores (games: &HashMap<u32, Game>) -> HashMap<u32, u32> {
-    games.iter().map(|(id, Game { winning_numbers, my_numbers })| (*id, my_numbers.into_iter().map(|x| if winning_numbers.contains(&x) {1} else {0}).sum())).collect()
+    games.iter().map(|(id, Game { winning_numbers, my_numbers })| (*id, my_numbers.iter().map(|x| if winning_numbers.contains(x) {1} else {0}).sum())).collect()
 }
 
 fn part1(scores: HashMap<u32, u32>) -> u32 {
@@ -40,7 +40,7 @@ fn part2 (scores: HashMap<u32, u32>, last_id: u32) -> u32 {
         let score = scores.get(&id).copied().unwrap();
         let current_count = counts.get(&id).copied().unwrap();
 
-        for new_id in (1..=score).into_iter().map(|x| x + id) {
+        for new_id in (1..=score).map(|x| x + id) {
             counts.entry(new_id).and_modify(|x| *x += current_count);
         }
     }
@@ -75,7 +75,7 @@ fn get_games (input: &str) -> (HashMap<u32, Game>, u32) {
     let mut games = HashMap::new();
     let mut last_id = 1;
 
-    for line in input.lines().into_iter() {
+    for line in input.lines() {
         let mut chars = line.chars();
         advance_iter(&mut chars, 5);
 

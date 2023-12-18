@@ -53,11 +53,10 @@ fn steps_till(
 }
 
 //first, target, nc
-fn parse_graph_p1<'a>(lines: String) -> (Vec<Node>, Vec<Node>, Vec<NodeContents>) {
+fn parse_graph_p1(lines: String) -> (Vec<Node>, Vec<Node>, Vec<NodeContents>) {
     let variants: HashMap<String, usize> = lines
         .lines()
-        .into_iter()
-        .map(|l| (&l[0..3]).to_string())
+        .map(|l| (l[0..3]).to_string())
         .enumerate()
         .map(|(a, b)| (b, a))
         .collect();
@@ -87,11 +86,10 @@ fn parse_graph_p1<'a>(lines: String) -> (Vec<Node>, Vec<Node>, Vec<NodeContents>
     )
 }
 
-fn parse_graph_p2<'a>(lines: String) -> (Vec<Node>, Vec<Node>, Vec<NodeContents>) {
+fn parse_graph_p2(lines: String) -> (Vec<Node>, Vec<Node>, Vec<NodeContents>) {
     let variants: HashMap<String, usize> = lines
         .lines()
-        .into_iter()
-        .map(|l| (&l[0..3]).to_string())
+        .map(|l| (l[0..3]).to_string())
         .enumerate()
         .map(|(a, b)| (b, a))
         .collect();
@@ -99,7 +97,7 @@ fn parse_graph_p2<'a>(lines: String) -> (Vec<Node>, Vec<Node>, Vec<NodeContents>
         .clone()
         .into_iter()
         .filter_map(|(s, idx)| {
-            if s.chars().last().unwrap() == 'A' {
+            if s.ends_with('A') {
                 Some(idx)
             } else {
                 None
@@ -110,7 +108,7 @@ fn parse_graph_p2<'a>(lines: String) -> (Vec<Node>, Vec<Node>, Vec<NodeContents>
         .clone()
         .into_iter()
         .filter_map(|(s, idx)| {
-            if s.chars().last().unwrap() == 'Z' {
+            if s.ends_with('A') {
                 Some(idx)
             } else {
                 None

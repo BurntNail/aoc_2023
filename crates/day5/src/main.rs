@@ -33,13 +33,7 @@ fn part1(a: Almanac, seeds: Vec<u64>) -> u64 {
 }
 
 fn part2(a: Almanac, seeds: Vec<u64>) -> u64 {
-    // let total_no = seeds
-    //     .iter()
-    //     .enumerate()
-    //     .map(|(i, n)| if i % 2 == 1 { *n } else { 0 })
-    //     .sum::<u64>();
-
-    let seeds = seeds.chunks_exact(2).into_iter().map(|window| {
+    let seeds = seeds.chunks_exact(2).map(|window| {
         let [a, b] = window else {
             unreachable!()
         };
@@ -52,7 +46,6 @@ fn part2(a: Almanac, seeds: Vec<u64>) -> u64 {
         .progress_count(seeds_len as u64)
         .map(|(start, end)| {
             (start..end)
-                .into_iter()
                 .map(|seed| {
                     let soil = a.seeds_to_soil.map(seed);
                     let fertiliser = a.soil_to_fertiliser.map(soil);
@@ -60,8 +53,7 @@ fn part2(a: Almanac, seeds: Vec<u64>) -> u64 {
                     let light = a.water_to_light.map(water);
                     let temperature = a.light_to_temperature.map(light);
                     let humidity = a.temperature_to_humidity.map(temperature);
-                    let location = a.humidity_to_location.map(humidity);
-                    location
+                    a.humidity_to_location.map(humidity)
                 })
                 .min().unwrap()
         })

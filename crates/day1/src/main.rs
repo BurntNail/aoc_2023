@@ -42,7 +42,7 @@ fn part2 (input: &str) -> u32{
 
     let mut sum = 0;
 
-    for line in input.lines().map(|x| x.chars().into_iter().collect::<Vec<_>>()) {
+    for line in input.lines().map(|x| x.chars().collect::<Vec<_>>()) {
         let len = line.len();
 
         let mut first = None;
@@ -58,7 +58,7 @@ fn part2 (input: &str) -> u32{
                         continue;
                     }
         
-                    (&line[i..end]).into_iter().zip(target.chars().into_iter()).all(|(a, b)| *a == b)
+                    (line[i..end]).iter().zip(target.chars()).all(|(a, b)| *a == b)
                 } else {
                     target.chars().next().unwrap() == line[i]
                 };                
