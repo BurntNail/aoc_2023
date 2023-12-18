@@ -1,5 +1,5 @@
-use rayon::prelude::*;
 use indicatif::ParallelProgressIterator;
+use rayon::prelude::*;
 
 fn main() {
     let input = include_str!("input.txt");
@@ -33,12 +33,15 @@ fn part1(a: Almanac, seeds: Vec<u64>) -> u64 {
 }
 
 fn part2(a: Almanac, seeds: Vec<u64>) -> u64 {
-    let seeds = seeds.chunks_exact(2).map(|window| {
-        let [a, b] = window else {
+    let seeds = seeds
+        .chunks_exact(2)
+        .map(|window| {
+            let [a, b] = window else {
             unreachable!()
         };
-        (*a, *a + *b)
-    }).collect::<Vec<_>>();
+            (*a, *a + *b)
+        })
+        .collect::<Vec<_>>();
     let seeds_len = seeds.len();
 
     seeds
@@ -55,9 +58,11 @@ fn part2(a: Almanac, seeds: Vec<u64>) -> u64 {
                     let humidity = a.temperature_to_humidity.map(temperature);
                     a.humidity_to_location.map(humidity)
                 })
-                .min().unwrap()
+                .min()
+                .unwrap()
         })
-        .min().unwrap()
+        .min()
+        .unwrap()
 }
 
 #[derive(Copy, Clone, Debug)]

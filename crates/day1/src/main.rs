@@ -6,19 +6,20 @@ fn main() {
     println!("{r}");
 }
 
-
-fn part1 (input: &str) -> u32{
+fn part1(input: &str) -> u32 {
     input.lines().fold(0, |acc, line| {
         println!("Working on {line}");
-        let numbers =  line.chars().filter_map(|c| c.is_ascii_digit().then_some(c as u32 - b'0' as u32)).collect::<Vec<_>>();
+        let numbers = line
+            .chars()
+            .filter_map(|c| c.is_ascii_digit().then_some(c as u32 - b'0' as u32))
+            .collect::<Vec<_>>();
         let first = numbers.first().unwrap();
 
         acc + (first * 10 + numbers.last().unwrap_or(first))
     })
 }
 
-
-fn part2 (input: &str) -> u32{
+fn part2(input: &str) -> u32 {
     let search_targets = [
         ("1", 1),
         ("2", 2),
@@ -50,24 +51,25 @@ fn part2 (input: &str) -> u32{
 
         for i in 0..len {
             for (target, result) in search_targets {
-
                 let works = if target.len() > 1 {
-
-                    let end = i+target.len();
+                    let end = i + target.len();
                     if end > len {
                         continue;
                     }
-        
-                    (line[i..end]).iter().zip(target.chars()).all(|(a, b)| *a == b)
+
+                    (line[i..end])
+                        .iter()
+                        .zip(target.chars())
+                        .all(|(a, b)| *a == b)
                 } else {
                     target.chars().next().unwrap() == line[i]
-                };                
+                };
 
                 if works {
                     if first.is_none() {
                         first = Some(result);
                     }
-                    
+
                     last = Some(result);
                 }
             }
@@ -77,7 +79,7 @@ fn part2 (input: &str) -> u32{
 
         let line_count = match (first, last) {
             (Some(a), Some(b)) => a * 10 + b,
-            _ => panic!("Failed at {line:?}")
+            _ => panic!("Failed at {line:?}"),
         };
 
         sum += line_count;

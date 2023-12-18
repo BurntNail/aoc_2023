@@ -9,11 +9,11 @@ fn main() {
 #[derive(Copy, Clone, Debug)]
 pub struct Race {
     pub time: u64,
-    pub record: u64
+    pub record: u64,
 }
 
 impl Race {
-    pub fn get_no_ways_to_beat (&self) -> u64 {
+    pub fn get_no_ways_to_beat(&self) -> u64 {
         let time = self.time as f64;
         let record = self.record as f64;
 
@@ -30,10 +30,10 @@ impl Race {
     }
 }
 
-pub fn parse_all_races (i: &str) -> Vec<Race> {
+pub fn parse_all_races(i: &str) -> Vec<Race> {
     let mut lines = i.lines().map(|i| {
         let mut list = vec![];
-    
+
         let mut accumulator = String::new();
         for ch in i.chars() {
             if ch.is_ascii_digit() {
@@ -43,22 +43,26 @@ pub fn parse_all_races (i: &str) -> Vec<Race> {
                 accumulator.clear();
             }
         }
-    
+
         if !accumulator.is_empty() {
             list.push(accumulator.parse().unwrap());
         }
-    
+
         list
     });
 
     let times = lines.next().unwrap();
     let records = lines.next().unwrap();
 
-    times.into_iter().zip(records.into_iter()).map(|(time, record)| Race { time, record }).collect()
+    times
+        .into_iter()
+        .zip(records.into_iter())
+        .map(|(time, record)| Race { time, record })
+        .collect()
 }
 
 //returns a vec just to get it to work with the p1 machinery
-fn parse_one_race (i: &str) -> Vec<Race> {
+fn parse_one_race(i: &str) -> Vec<Race> {
     let mut nums = i.lines().map(|x| {
         let chars = x.chars();
         let numbers = chars.filter(|c| c.is_ascii_digit());
@@ -68,9 +72,5 @@ fn parse_one_race (i: &str) -> Vec<Race> {
     let time = nums.next().unwrap();
     let record = nums.next().unwrap();
 
-    vec![
-        Race {
-            time, record
-        }
-    ]
+    vec![Race { time, record }]
 }

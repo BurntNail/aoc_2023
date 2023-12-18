@@ -96,24 +96,12 @@ fn parse_graph_p2(lines: String) -> (Vec<Node>, Vec<Node>, Vec<NodeContents>) {
     let starts = variants
         .clone()
         .into_iter()
-        .filter_map(|(s, idx)| {
-            if s.ends_with('A') {
-                Some(idx)
-            } else {
-                None
-            }
-        })
+        .filter_map(|(s, idx)| if s.ends_with('A') { Some(idx) } else { None })
         .collect();
     let finishes = variants
         .clone()
         .into_iter()
-        .filter_map(|(s, idx)| {
-            if s.ends_with('A') {
-                Some(idx)
-            } else {
-                None
-            }
-        })
+        .filter_map(|(s, idx)| if s.ends_with('A') { Some(idx) } else { None })
         .collect();
 
     let mut map = vec![None; variants.len()];

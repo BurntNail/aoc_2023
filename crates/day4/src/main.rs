@@ -1,4 +1,4 @@
-use std::{fmt::Debug, str::FromStr, collections::HashMap};
+use std::{collections::HashMap, fmt::Debug, str::FromStr};
 
 fn main() {
     let input = include_str!("input.txt");
@@ -11,30 +11,52 @@ fn main() {
     println!("{n}");
 }
 
-fn get_scores (games: &HashMap<u32, Game>) -> HashMap<u32, u32> {
-    games.iter().map(|(id, Game { winning_numbers, my_numbers })| (*id, my_numbers.iter().map(|x| if winning_numbers.contains(x) {1} else {0}).sum())).collect()
+fn get_scores(games: &HashMap<u32, Game>) -> HashMap<u32, u32> {
+    games
+        .iter()
+        .map(
+            |(
+                id,
+                Game {
+                    winning_numbers,
+                    my_numbers,
+                },
+            )| {
+                (
+                    *id,
+                    my_numbers
+                        .iter()
+                        .map(|x| if winning_numbers.contains(x) { 1 } else { 0 })
+                        .sum(),
+                )
+            },
+        )
+        .collect()
 }
 
 fn part1(scores: HashMap<u32, u32>) -> u32 {
-    scores.values().copied().map(|points| {
-        if points > 0 {
-            let mut i = 1;
-            for _ in 1..points {
-                i *= 2;
+    scores
+        .values()
+        .copied()
+        .map(|points| {
+            if points > 0 {
+                let mut i = 1;
+                for _ in 1..points {
+                    i *= 2;
+                }
+                i
+            } else {
+                0
             }
-            i
-        } else {
-            0
-        }
-    }).sum()
+        })
+        .sum()
 }
 
-fn part2 (scores: HashMap<u32, u32>, last_id: u32) -> u32 {
+fn part2(scores: HashMap<u32, u32>, last_id: u32) -> u32 {
     let mut counts = HashMap::new();
     for k in scores.keys() {
         counts.insert(*k, 1);
     }
-
 
     for id in 1..=last_id {
         let score = scores.get(&id).copied().unwrap();
@@ -45,18 +67,19 @@ fn part2 (scores: HashMap<u32, u32>, last_id: u32) -> u32 {
         }
     }
 
-
     counts.values().sum()
 }
 
-fn advance_iter<I: Iterator> (i: &mut I, n: usize) {
+fn advance_iter<I: Iterator>(i: &mut I, n: usize) {
     for _ in 0..n {
         let _ = i.next();
     }
 }
 
-fn get_t<T: FromStr> (i: &mut impl Iterator<Item = char>, len: usize) -> T
-where <T as FromStr>::Err: Debug {
+fn get_t<T: FromStr>(i: &mut impl Iterator<Item = char>, len: usize) -> T
+where
+    <T as FromStr>::Err: Debug,
+{
     let mut tmp = String::new();
     for _ in 0..len {
         tmp.push(i.next().unwrap());
@@ -68,10 +91,10 @@ where <T as FromStr>::Err: Debug {
 
 pub struct Game {
     pub winning_numbers: Vec<u32>,
-    pub my_numbers: Vec<u32>
+    pub my_numbers: Vec<u32>,
 }
 
-fn get_games (input: &str) -> (HashMap<u32, Game>, u32) {
+fn get_games(input: &str) -> (HashMap<u32, Game>, u32) {
     let mut games = HashMap::new();
     let mut last_id = 1;
 
@@ -100,7 +123,10 @@ fn get_games (input: &str) -> (HashMap<u32, Game>, u32) {
             list
         };
 
-        let game = Game { winning_numbers, my_numbers };
+        let game = Game {
+            winning_numbers,
+            my_numbers,
+        };
         games.insert(id, game);
         last_id = id;
     }
