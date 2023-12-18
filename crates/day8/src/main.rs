@@ -1,28 +1,28 @@
 use std::collections::HashMap;
 
-pub type Node = [u8; 3];
+type Node = usize;
 
 fn main() {
     let input = include_str!("input.txt");
     let mut lines = input.lines();
 
     let directions: Vec<bool> = lines.next().unwrap().chars().map(|c| c == 'L').collect();
-    skip_non_owning(&mut lines, 1);
-    let (start, graph) = parse_graph(lines);
-    let steps = steps_till(graph, directions, start, [25, 25, 25]);
+    let _ = lines.next();
+    let (start, target, graph) = parse_graph(lines.map(|x| x.to_string() + "\n").collect());
 
+    let steps = steps_till(graph, directions, start, target);
     println!("{steps}");
 }
 
-fn steps_till (graph: HashMap<Node, NodeContents>, directions: Vec<bool>, start: Node, target: Node) -> u32 {
-    let mut steps = 0;
+fn steps_till (graph: Vec<NodeContents>, directions: Vec<bool>, start: Node, target: Node) -> u128 {
+    let mut steps = 1;
 
-    let mut i = 0;
     let mut current = start;
+    let mut directions = directions.into_iter().cycle();
     loop {
-        steps += 1;
-        let node_contents = graph.get(&current).unwrap();
-        let new_node = if directions[i] {
+        
+        let node_contents = graph[current];
+        let new_node = if directions.next().unwrap() {
             node_contents.left
         } else {
             node_contents.right
@@ -33,54 +33,38 @@ fn steps_till (graph: HashMap<Node, NodeContents>, directions: Vec<bool>, start:
         }
 
         current = new_node;
-        i += 1;
-        i %= directions.len();
+        steps += 1;
     }
 
 
     steps
 }
 
-fn parse_graph<'a> (lines: impl Iterator<Item = &'a str>) -> (Node, HashMap<Node, NodeContents>) {
-    fn str_to_node (s: impl Iterator<Item = char>) -> Node {
-        let mapped = s.map(|c| c as u8 - b'A').collect::<Vec<_>>();
-        mapped.try_into().unwrap()
-    }
+//first, target, nc
+fn parse_graph<'a> (lines: String) -> (Node, Node, Vec<NodeContents>) {
+    let variants: HashMap<String, usize> = lines.lines().into_iter().map(|l| (&l[0..3]).to_string()).enumerate().map(|(a, b)| (b, a)).collect();
 
-    let mut map = HashMap::new();
     let mut first = None;
+    let mut map = vec![None; variants.len()];
 
-    for line in lines {
-        let mut chars = line.chars();
-
-        let start = str_to_node(take_non_owning(&mut chars, 3).into_iter());
-        skip_non_owning(&mut chars, 4);
-        let left = str_to_node(take_non_owning(&mut chars, 3).into_iter());
-        skip_non_owning(&mut chars, 2);
-        let right = str_to_node(take_non_owning(&mut chars, 3).into_iter());
-
+    for line in lines.lines() {
+        let start = variants.get(&line[0..3]).unwrap();
         if first.is_none() {
-            first = Some(start);
+            first = Some(*start);
         }
 
-        map.insert(start, NodeContents{left, right});
+
+        let left = variants.get(&line[7..10]).unwrap();
+        let right = variants.get(&line[12..15]).unwrap();
+
+        map[*start] = Some(NodeContents {
+            left: *left, right: *right
+        });
     }
 
-    (first.unwrap(), map)
-}
 
-fn take_non_owning<T> (i: &mut impl Iterator<Item = T>, n: usize) -> Vec<T> {
-    let mut v = vec![];
-    for _ in 0..n {
-        v.push(i.next().unwrap());
-    }
-    v
-}
+    (variants.get("AAA").copied().unwrap(), variants.get("ZZZ").copied().unwrap(), map.into_iter().map(|x| x.unwrap()).collect())
 
-fn skip_non_owning(i: &mut impl Iterator, n: usize) {
-    for _ in 0..n {
-        let _ = i.next();
-    }
 }
 
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq)]
